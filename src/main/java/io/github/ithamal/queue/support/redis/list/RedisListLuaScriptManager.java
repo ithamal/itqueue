@@ -19,7 +19,7 @@ public class RedisListLuaScriptManager {
     @SneakyThrows
     public static byte[] get(String name) {
         return scriptMap.computeIfAbsent(name, k -> {
-            InputStream inputStream = RedisListQueueConsumer.class.getResourceAsStream("./lua/" + name);
+            InputStream inputStream = RedisListQueueConsumer.class.getResourceAsStream("lua/" + name);
             if (inputStream == null) {
                 throw new RuntimeException("脚本文件[" + name + "]不存在");
             }

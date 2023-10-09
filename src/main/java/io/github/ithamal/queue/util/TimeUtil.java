@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /**
  * @author: ken.lin
- * @date: 2023-02-23 23:22
+ * @since : 2023-02-23 23:22
  */
 public class TimeUtil {
 
