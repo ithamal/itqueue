@@ -21,7 +21,7 @@ public class DefaultConsumersContainer implements ConsumersContainer {
     private final ConcurrentHashMap<ConsumerGroup, ConsumerGroupContainer> containerMap = new ConcurrentHashMap<>();
 
     @Override
-    public void register(ConsumerGroup consumerGroup, MessageHandler handler) {
+    public void binding(ConsumerGroup consumerGroup, MessageHandler handler) {
         ConsumerGroupContainer container = containerMap.computeIfAbsent(consumerGroup,
                 it -> new DefaultConsumerGroupContainer(consumerGroup));
         container.registerHandler(handler);
@@ -29,7 +29,7 @@ public class DefaultConsumersContainer implements ConsumersContainer {
     }
 
     @Override
-    public void unregister(ConsumerGroup consumerGroup, MessageHandler handler) {
+    public void unbinding(ConsumerGroup consumerGroup, MessageHandler handler) {
         ConsumerGroupContainer container = containerMap.computeIfAbsent(consumerGroup,
                 it -> new DefaultConsumerGroupContainer(consumerGroup));
         container.unregister(handler);

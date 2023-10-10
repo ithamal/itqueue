@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -61,7 +62,6 @@ public class ItQueueAutoConfig {
     }
 
     /**
-     *
      * @param queueFactories 队列工厂集合
      * @return 生产者管理器
      */
@@ -100,17 +100,51 @@ public class ItQueueAutoConfig {
         ConsumersContainerLifecycle consumersContainerLifecycle = new ConsumersContainerLifecycle();
         ConsumersContainer consumersContainer = consumersContainerLifecycle.getConsumerServer();
         for (MessageHandler<?> handler : messageHandlerProvider.getHandlers()) {
-            MessageHandlerBind annotation = handler.getClass().getAnnotation(MessageHandlerBind.class);
-            String[] groups = annotation.consumerGroups();
-            for (String group : groups) {
+            MessageHandlerBind annotation = getHandlerAnnotation(handler);
+            if (annotation.queues().length == 0 && annotation.consumerGroups().length == 0) {
+                throw new IllegalArgumentException("One must be set property for annotation MessageHandlerBind");
+            }
+            if (annotation.queues().length > 0 && annotation.consumerGroups().length > 0) {
+                throw new IllegalArgumentException("Only one property can be set for annotation MessageHandlerBind");
+            }
+            if(annotation.queues().length > 0) {
+                boolean hasConsumerGroup = false;
+                for (String queue : annotation.queues()) {
+                    List<ConsumerGroup> consumerGroups = consumerManager.findConsumerGroupByQueue(queue);
+                    for (ConsumerGroup consumerGroup : consumerGroups) {
+                        consumersContainer.binding(consumerGroup, handler);
+                        hasConsumerGroup = true;
+                    }
+                }
+                if (!hasConsumerGroup) {
+                    throw new BeanDefinitionValidationException("Not found consumer group of queues: " + Arrays.toString(annotation.queues()));
+                }
+            }
+            for (String group : annotation.consumerGroups()) {
                 ConsumerGroup consumerGroup = consumerManager.getConsumerGroup(group);
                 if (consumerGroup == null) {
                     throw new BeanDefinitionValidationException("Not found consumer group: " + group);
                 }
-                consumersContainer.register(consumerGroup, handler);
+                consumersContainer.binding(consumerGroup, handler);
             }
         }
         return consumersContainerLifecycle;
     }
 
+
+    private static MessageHandlerBind getHandlerAnnotation(MessageHandler<?> handler) {
+        Class<?> aClass = handler.getClass();
+        MessageHandlerBind annotation = aClass.getAnnotation(MessageHandlerBind.class);
+        if (annotation != null) {
+            return annotation;
+        }
+        aClass = aClass.getSuperclass();
+        if (aClass != null) {
+            annotation = aClass.getAnnotation(MessageHandlerBind.class);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+        return null;
+    }
 }

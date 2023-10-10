@@ -50,6 +50,9 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
 
     @Override
     public void registerHandler(MessageHandler<?> handler) {
+        if (handlerList.contains(handler)) {
+            return;
+        }
         handlerList.add(handler);
     }
 
@@ -111,7 +114,7 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
                 rePushTask();
                 return null;
             }).exceptionally(e -> {
-                logger.error("Occur exception when consumer ["+ consumer.getName() +"] handling", e);
+                logger.error("Occur exception when consumer [" + consumer.getName() + "] handling", e);
                 rePushTask();
                 return null;
             });
@@ -120,13 +123,13 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
                     future.get();
                 }
             } catch (Exception e) {
-                logger.error("Occur exception when consumer ["+ consumer.getName() +"] handling", e);
+                logger.error("Occur exception when consumer [" + consumer.getName() + "] handling", e);
             }
         }
 
-        private void rePushTask(){
+        private void rePushTask() {
             synchronized (lock) {
-                if(!threadPoolExecutor.isShutdown() && !threadPoolExecutor.isTerminating()) {
+                if (!threadPoolExecutor.isShutdown() && !threadPoolExecutor.isTerminating()) {
                     threadPoolExecutor.execute(this);
                 }
             }

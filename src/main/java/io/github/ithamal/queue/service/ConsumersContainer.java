@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ConsumersContainer {
 
-    void register(ConsumerGroup consumerGroup, MessageHandler handler);
+    void binding(ConsumerGroup consumerGroup, MessageHandler handler);
 
-    void unregister(ConsumerGroup consumerGroup, MessageHandler handler);
+    void unbinding(ConsumerGroup consumerGroup, MessageHandler handler);
 
     void start();
 

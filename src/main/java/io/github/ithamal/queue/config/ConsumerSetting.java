@@ -47,8 +47,8 @@ public class ConsumerSetting {
         name = name != null ? name : queue;
         prefix = prefix != null ? prefix : "queue:";
         pollSize = pollSize != null ? pollSize : 10;
-        minThreads = minThreads != null ? minThreads : 10;
-        maxThreads = maxThreads != null ? maxThreads : 1;
+        minThreads = minThreads != null ? minThreads : 1;
+        maxThreads = maxThreads != null ? maxThreads : 10;
         consumerNum = consumerNum != null ? consumerNum : 1;
         handleAsync = handleAsync != null ? handleAsync : false;
         deleteAfterAck = deleteAfterAck != null ? deleteAfterAck : false;
