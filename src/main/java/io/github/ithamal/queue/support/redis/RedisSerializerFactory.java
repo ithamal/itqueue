@@ -15,18 +15,22 @@ public class RedisSerializerFactory {
 
     private final static ConcurrentHashMap<String, RedisSerializer<?>> serializerMap = new ConcurrentHashMap<>();
 
-    public static RedisSerializer getSerializer(String name){
-        return serializerMap.computeIfAbsent(name, key->{
-            if(name.equals("jdk")){
+    public static RedisSerializer getSerializer(String name) {
+        return serializerMap.computeIfAbsent(name, key -> {
+            if (name.equals("jdk")) {
                 return new JdkSerializationRedisSerializer();
             }
-            if(name.equals("string")){
+            if (name.equals("string")) {
                 return new StringRedisSerializer();
             }
-            if(name.equals("json")){
+            if (name.equals("json")) {
                 return new GenericJackson2JsonRedisSerializer();
             }
-            throw new RuntimeException("不支持的序列化方法：" + name);
+            try {
+                return (RedisSerializer<?>) Class.forName(name).newInstance();
+            } catch (Throwable e) {
+                throw new RuntimeException("序列化类加载失败：" + name);
+            }
         });
     }
 }
