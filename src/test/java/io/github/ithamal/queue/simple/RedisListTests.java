@@ -32,12 +32,14 @@ public class RedisListTests {
         // 生产者配置
         ProducerSetting producerSetting = new ProducerSetting();
         producerSetting.setQueue("test");
+        producerSetting.setImplClass("redisList");
         producerSetting.afterProperties();
         // 消费组配置
         ConsumerSetting consumerSetting = new ConsumerSetting();
         consumerSetting.setQueue("test");
         consumerSetting.setGroupName("group1");
         consumerSetting.setConsumerNum(2);
+        consumerSetting.setImplClass("redisList");
         consumerSetting.afterProperties();
         //
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();

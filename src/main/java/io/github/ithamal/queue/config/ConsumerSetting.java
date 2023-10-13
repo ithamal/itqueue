@@ -42,9 +42,9 @@ public class ConsumerSetting {
 
     public void afterProperties() {
         Assert.notNull(queue, "Consumer setting [queue] isn't specified");
-        Assert.notNull(groupName, "Consumer setting [groupName] isn't specified");
         Assert.notNull(implClass, "Consumer setting [implClass] isn't specified");
         name = name != null ? name : queue;
+        groupName = groupName != null ? groupName : "default";
         prefix = prefix != null ? prefix : "queue:";
         pollSize = pollSize != null ? pollSize : 10;
         minThreads = minThreads != null ? minThreads : 1;

@@ -7,7 +7,6 @@ itqueue:
   consumers:
     - queue: test
       prefix: "mq:"
-      groupName: group1
       implClass: redisList
       consumerNum: 4
       pollSize: 10

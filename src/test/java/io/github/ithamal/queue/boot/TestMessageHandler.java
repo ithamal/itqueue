@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @since: 2023-09-30 00:06
  */
 @Component
-@MessageHandlerBind(queues = "test")
+@MessageHandlerBind("test")
 public class TestMessageHandler extends MessageHandlerAdapter<String> {
 
     @Override

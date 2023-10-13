@@ -8,9 +8,9 @@ import java.util.Collection;
  */
 public interface Consumer {
 
-    ConsumerGroup getGroup();
-
     String getName();
+
+    ConsumerGroup getGroup();
 
     Collection<Message<?>> poll(int size);
 

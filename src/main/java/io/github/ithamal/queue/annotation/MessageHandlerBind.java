@@ -11,14 +11,8 @@ import java.lang.annotation.*;
 public @interface MessageHandlerBind {
 
     /**
-     * 队列名
+     * 消费组名称
      * @return
      */
-    String[] queues() default {};
-
-    /**
-     * 消费组名
-     * @return
-     */
-    String[] consumerGroups() default {};
+    String[] value() ;
 }

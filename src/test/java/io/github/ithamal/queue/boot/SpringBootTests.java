@@ -34,7 +34,7 @@ public class SpringBootTests {
         for (int i = 0; i < 10; i++) {
             producer.put(SimpleMessage.create(i + "-" + new Date()));
         }
-        ConsumerGroup consumerGroup = consumerManager.getConsumerGroup("test");
+        ConsumerGroup consumerGroup = consumerManager.getConsumer("test");
         for (Consumer consumer : consumerGroup.getConsumers()) {
             Collection<Message<?>> mesasges = consumer.poll(2);
             for (Message<?> mesasge : mesasges) {

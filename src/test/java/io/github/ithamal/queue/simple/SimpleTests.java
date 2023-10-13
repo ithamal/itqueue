@@ -24,12 +24,14 @@ public class SimpleTests {
         // 生产者配置
         ProducerSetting producerSetting = new ProducerSetting();
         producerSetting.setQueue("test");
+        producerSetting.setImplClass("jdk");
         producerSetting.afterProperties();
         // 消费组配置
         ConsumerSetting consumerSetting = new ConsumerSetting();
         consumerSetting.setQueue("test");
         consumerSetting.setGroupName("group1");
         consumerSetting.setConsumerNum(5);
+        consumerSetting.setImplClass("jdk");
         consumerSetting.afterProperties();
         // 测试
         JdkQueueFactory queueFactory = new JdkQueueFactory();

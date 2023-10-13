@@ -101,31 +101,11 @@ public class ItQueueAutoConfig {
         ConsumersContainer consumersContainer = consumersContainerLifecycle.getConsumerServer();
         for (MessageHandler<?> handler : messageHandlerProvider.getHandlers()) {
             MessageHandlerBind annotation = getHandlerAnnotation(handler);
-            if (annotation.queues().length == 0 && annotation.consumerGroups().length == 0) {
-                throw new IllegalArgumentException("One must be set property for annotation MessageHandlerBind");
-            }
-            if (annotation.queues().length > 0 && annotation.consumerGroups().length > 0) {
-                throw new IllegalArgumentException("Only one property can be set for annotation MessageHandlerBind");
-            }
-            if(annotation.queues().length > 0) {
-                boolean hasConsumerGroup = false;
-                for (String queue : annotation.queues()) {
-                    List<ConsumerGroup> consumerGroups = consumerManager.findConsumerGroupByQueue(queue);
-                    for (ConsumerGroup consumerGroup : consumerGroups) {
-                        consumersContainer.binding(consumerGroup, handler);
-                        hasConsumerGroup = true;
-                    }
+            for (String pattern : annotation.value()) {
+                List<ConsumerGroup> consumerGroups = consumerManager.findConsumers(pattern);
+                for (ConsumerGroup consumerGroup : consumerGroups) {
+                    consumersContainer.binding(consumerGroup, handler);
                 }
-                if (!hasConsumerGroup) {
-                    throw new BeanDefinitionValidationException("Not found consumer group of queues: " + Arrays.toString(annotation.queues()));
-                }
-            }
-            for (String group : annotation.consumerGroups()) {
-                ConsumerGroup consumerGroup = consumerManager.getConsumerGroup(group);
-                if (consumerGroup == null) {
-                    throw new BeanDefinitionValidationException("Not found consumer group: " + group);
-                }
-                consumersContainer.binding(consumerGroup, handler);
             }
         }
         return consumersContainerLifecycle;

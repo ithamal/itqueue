@@ -40,7 +40,7 @@ public class RedisListQueueFactory implements QueueFactory {
         ConsumerGroup group = new ConsumerGroup() {
             @Override
             public String getName() {
-                return setting.getGroupName();
+                return setting.getName();
             }
 
             @Override
