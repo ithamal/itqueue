@@ -38,7 +38,7 @@ public class ProducerManager {
 
     private QueueFactory selectQueueFactory(String implClass) {
         for (QueueFactory queueFactory : queueFactories) {
-            if (queueFactory.getName().equals(implClass)) {
+            if (queueFactory.support(implClass)) {
                 return queueFactory;
             }
         }

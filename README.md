@@ -2,21 +2,32 @@
 ```xml
 <groupId>io.github.ithamal</groupId>
 <artifactId>itqueue</artifactId>
-<version>1.0.2</version>
+<version>1.0.3</version>
 ```
 
 ### 特性
 - 完整的消息模式，支持手动拉取和自动拉取模式
 - 支持消息重试、死信队列等特性
 - 支持多消费者、多线程消费消息
-- 支持Redis-List数据类型存储数据
+- 支持Redis-List数据类型存储数据 (仅单消费组)
+- 支持Redis-ZSet数据类型存储数据 (支持多消费组)
 - 与spring-data-redis无缝集成
 
-### Redis-List实现的分叉数据
+### Redis-List数据结构
 - 原始数据： {队列名}-bucket#日期MMdd (Hash结构)
 - 待消费数据：{队列名}-inbound (List结构)
 - 已消费(待ACK)：{队列名}-outbound:消费者名 (ZSet结构)
-- 重试次数：{队列名}-try-num (Hash结构)
+- 消费组信息：{队列名}-consumer-group (Hash结构)
+- 消费计数：{队列名}-consume-num (Hash结构)
+- 死信数据：{队列名}-dead:消费者名 (Hash结构)
+- 归档数据(ACK后)：{队列名}-archive#日期MMdd (Hash结构)
+
+### Redis-ZSet数据结构
+- 原始数据： {队列名}-bucket#日期MMdd (Hash结构)
+- 待消费数据：{队列名}-inbound (ZSet结构)
+- 已消费(待ACK)：{队列名}-outbound:消费者名 (ZSet结构)
+- 消费组信息：{队列名}-consumer-group (Hash结构)
+- 消费计数：{队列名}-consume-num (Hash结构)
 - 死信数据：{队列名}-dead:消费者名 (Hash结构)
 - 归档数据(ACK后)：{队列名}-archive#日期MMdd (Hash结构)
 

@@ -1,4 +1,4 @@
-package io.github.ithamal.queue.simple;
+package io.github.ithamal.queue.jdk;
 
 import io.github.ithamal.queue.config.ConsumerSetting;
 import io.github.ithamal.queue.config.ProducerSetting;
@@ -8,6 +8,7 @@ import io.github.ithamal.queue.service.impl.DefaultConsumerGroupContainer;
 import io.github.ithamal.queue.support.jdk.JdkQueueFactory;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author: ken.lin
  * @since: 2023-09-28 16:20
  */
-public class SimpleTests {
+public class JdkQueueTests {
 
     @Test
     public void testConsumer() {
@@ -93,5 +94,16 @@ public class SimpleTests {
         container.shutdown();
         container.awaitTermination(10, TimeUnit.MINUTES);
         System.out.println("已退出");
+    }
+
+    public static void main(String[] args) {
+        // 1.2
+        double d = 123.456;
+        System.out.println(Long.toBinaryString(Double.doubleToRawLongBits(d)));
+
+        String str = "0 10000000000 1001000111101011100001010001111010111000010100011110".replace(" ","");
+        System.out.println(str);
+        BigInteger num = new BigInteger(str, 2);
+        System.out.println(Double.longBitsToDouble(num.longValue()));
     }
 }

@@ -1,4 +1,4 @@
-package io.github.ithamal.queue.util.sequence;
+package io.github.ithamal.queue.sequence;
 
 
 public interface SequenceNumber {

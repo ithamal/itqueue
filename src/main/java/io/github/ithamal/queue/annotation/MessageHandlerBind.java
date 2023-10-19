@@ -15,4 +15,10 @@ public @interface MessageHandlerBind {
      * @return
      */
     String[] value() ;
+
+    /**
+     * 限定消费组
+     * @return
+     */
+    String consumerGroup() default "";
 }

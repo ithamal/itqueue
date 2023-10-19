@@ -38,6 +38,8 @@ public class ConsumerSetting {
 
     private Boolean deleteAfterAck;
 
+    private Boolean isArchive;
+
     private String implClass;
 
     public void afterProperties() {
@@ -52,6 +54,7 @@ public class ConsumerSetting {
         consumerNum = consumerNum != null ? consumerNum : 1;
         handleAsync = handleAsync != null ? handleAsync : false;
         deleteAfterAck = deleteAfterAck != null ? deleteAfterAck : false;
+        isArchive = isArchive != null ? isArchive : true;
         serializer = serializer != null ? serializer : "json";
         retryLater = retryLater != null ? retryLater : "10s,30s,1m,2m,3m,4m,5m,6m,7m,8m,9m,10m,20m,30m,1h,2h";
 //        retryLater = retryLater != null ? retryLater : "30s,60s";

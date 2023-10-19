@@ -1,11 +1,11 @@
-package io.github.ithamal.queue.simple;
+package io.github.ithamal.queue.redis.zset;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import io.github.ithamal.queue.config.ConsumerSetting;
 import io.github.ithamal.queue.config.ProducerSetting;
 import io.github.ithamal.queue.core.*;
-import io.github.ithamal.queue.support.redis.list.RedisListQueueFactory;
+import io.github.ithamal.queue.support.redis.zset.RedisZSetQueueFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * @author: ken.lin
  * @since: 2023-09-28 16:20
  */
-public class RedisListTests {
+public class RedisZSetTests {
 
     @BeforeEach
     public void before(){
@@ -32,30 +32,34 @@ public class RedisListTests {
         // 生产者配置
         ProducerSetting producerSetting = new ProducerSetting();
         producerSetting.setQueue("test");
-        producerSetting.setImplClass("redisList");
+        producerSetting.setImplClass("redisZSet");
         producerSetting.afterProperties();
         // 消费组配置
         ConsumerSetting consumerSetting = new ConsumerSetting();
         consumerSetting.setQueue("test");
         consumerSetting.setGroupName("group1");
-        consumerSetting.setConsumerNum(2);
-        consumerSetting.setImplClass("redisList");
+        consumerSetting.setConsumerNum(1);
+        consumerSetting.setImplClass("redisZSet");
+        consumerSetting.setDeleteAfterAck(true);
         consumerSetting.afterProperties();
         //
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
         connectionFactory.setHostName("localhost");
         connectionFactory.setPort(6379);
         connectionFactory.setPassword("");
-        connectionFactory.setDatabase(4);
+        connectionFactory.setDatabase(0);
         connectionFactory.afterPropertiesSet();
         // 测试
-        RedisListQueueFactory queueFactory = new RedisListQueueFactory(connectionFactory);
+        RedisZSetQueueFactory queueFactory = new RedisZSetQueueFactory(connectionFactory);
         Producer producer = queueFactory.createProducer(producerSetting);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             producer.put(SimpleMessage.create("message-" + i));
         }
+//        if(1 == 1){
+//            return;
+//        }
         ConsumerGroup consumerGroup = queueFactory.createConsumerGroup(consumerSetting);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             for (Consumer consumer : consumerGroup.getConsumers()) {
                 Collection<Message<?>> messages = consumer.poll(2);
                 for (Message<?> message : messages) {

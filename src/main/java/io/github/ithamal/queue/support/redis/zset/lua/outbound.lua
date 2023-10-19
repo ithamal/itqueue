@@ -21,7 +21,6 @@ local elements  = {}
 
 -- 返回结果，并加入到出栈集合
 local results  = {}
-local index = 1
 
 -- 超时重试
 if size > 0 then
@@ -29,18 +28,22 @@ if size > 0 then
     for i = 1, #elements do
         local element = elements[i]
         table.insert(results, element)
+        end
     end
-end
 
 -- 出栈（记录消费组偏移量）
 size = size - #elements
-for i = 1, size  do
-    local element = redis.call('rpop', inboundKey)
-    if element then
-        redis.call('ZADD', outboundKey, time, element)
-        table.insert(results, element)
-    else
-        break
+if size > 0 then
+    elements = redis.call('zrangebyscore', inboundKey,  '('..score , '+inf', 'withscores', 'limit', 0, size)
+    if #elements > 1 then
+        score = elements[#elements]
+        redis.call('hmset', consumeGroupKey, 'offset', score, 'time', time)
+    end
+    for i = 1, #elements do
+        if i % 2 == 1  then
+            local element = elements[i]
+            table.insert(results, element)
+        end
     end
 end
 

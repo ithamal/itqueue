@@ -1,4 +1,4 @@
-package io.github.ithamal.queue.util.sequence;
+package io.github.ithamal.queue.sequence;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -6,15 +6,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 可回归的序号生成器
  */
-public class ReuseSequenceNumber implements SequenceNumber{
+public class SimpleSequenceNumber implements SequenceNumber{
 
-    public static final AtomicInteger DEFAULT_VALUE = new AtomicInteger(0);
-    public static final int MAX_VALUE = 0x7FFFFFFF;
+    public static final int MAX_VALUE = 0xffff;
 
     private AtomicInteger value;
 
-    public ReuseSequenceNumber() {
-        this.value = DEFAULT_VALUE;
+    public SimpleSequenceNumber(int initialValue) {
+        this.value = new AtomicInteger(initialValue);
     }
 
     /**
@@ -34,13 +33,6 @@ public class ReuseSequenceNumber implements SequenceNumber{
     @Override
     public int getValue() {
         return value.get();
-    }
-
-    /**
-     * 重置最小值
-     */
-    synchronized public void reset() {
-        this.value = DEFAULT_VALUE;
     }
 
 }

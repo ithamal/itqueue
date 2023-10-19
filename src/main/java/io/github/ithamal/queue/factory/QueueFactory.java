@@ -11,7 +11,7 @@ import io.github.ithamal.queue.core.Producer;
  */
 public interface QueueFactory {
 
-    String getName();
+    boolean support(String implClass);
 
     Producer createProducer(ProducerSetting setting);
 

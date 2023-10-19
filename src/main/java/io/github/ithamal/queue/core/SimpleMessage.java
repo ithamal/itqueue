@@ -1,6 +1,6 @@
 package io.github.ithamal.queue.core;
 
-import io.github.ithamal.queue.util.sequence.MsgId;
+import io.github.ithamal.queue.sequence.MsgId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,17 +14,14 @@ public class SimpleMessage<T> implements Message<T> {
 
     private Long id;
 
-    private Long time;
-
     private T payload;
 
-    private Integer retries;
+    private Long time;
 
     public static <T> SimpleMessage<T> create(T payload){
         SimpleMessage<T> obj = new SimpleMessage<>();
-        obj.id = MsgId.create().getValue();
-        obj.time = System.currentTimeMillis();
         obj.payload = payload;
+        obj.time = System.currentTimeMillis();
         return obj;
     }
 
@@ -32,8 +29,13 @@ public class SimpleMessage<T> implements Message<T> {
     public String toString() {
         return "SimpleMessage{" +
                 "id=" + id +
-                ", time=" + time +
+                ", time=" + getTime() +
                 ", payload=" + payload +
                 '}';
+    }
+
+    @Override
+    public Long getTime() {
+        return time;
     }
 }

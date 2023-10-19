@@ -25,8 +25,8 @@ public class RedisListQueueFactory implements QueueFactory {
     }
 
     @Override
-    public String getName() {
-        return "redisList";
+    public boolean support(String implClass) {
+        return implClass.equalsIgnoreCase("redisList");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class RedisListQueueFactory implements QueueFactory {
         ConsumerGroup group = new ConsumerGroup() {
             @Override
             public String getName() {
-                return setting.getName();
+                return setting.getGroupName();
             }
 
             @Override

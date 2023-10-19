@@ -1,18 +1,19 @@
 
-package io.github.ithamal.queue.support.redis.list;
+package io.github.ithamal.queue.support.redis.zset;
 
 
 import io.github.ithamal.queue.config.ConsumerSetting;
 import io.github.ithamal.queue.core.Consumer;
 import io.github.ithamal.queue.core.ConsumerGroup;
 import io.github.ithamal.queue.core.Message;
+import io.github.ithamal.queue.sequence.MsgId;
 import io.github.ithamal.queue.support.redis.RedisQueueKeysBuilder;
 import io.github.ithamal.queue.support.redis.RedisSerializerFactory;
 import io.github.ithamal.queue.util.TimeUtil;
-import io.github.ithamal.queue.sequence.MsgId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.connection.*;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.time.Duration;
@@ -23,9 +24,9 @@ import java.util.stream.Collectors;
  * @author: ken.lin
  * @since: 2023-09-28 15:49
  */
-public class RedisListQueueConsumer implements Consumer {
+public class RedisZSetQueueConsumer implements Consumer {
 
-    private final static Logger logger = LoggerFactory.getLogger(RedisListQueueConsumer.class);
+    private final static Logger logger = LoggerFactory.getLogger(RedisZSetQueueConsumer.class);
 
     private final String name;
 
@@ -39,7 +40,7 @@ public class RedisListQueueConsumer implements Consumer {
 
     private final Duration[] retryLater;
 
-    public RedisListQueueConsumer(String name, ConsumerGroup group, RedisConnectionFactory connectionFactory) {
+    public RedisZSetQueueConsumer(String name, ConsumerGroup group, RedisConnectionFactory connectionFactory) {
         this.name = name;
         this.group = group;
         this.connectionFactory = connectionFactory;
@@ -61,7 +62,7 @@ public class RedisListQueueConsumer implements Consumer {
 
     @Override
     public Collection<Message<?>> poll(int size) {
-        List<byte[]> idBytesList = RedisListScriptHelper.poll(connectionFactory, keysBuilder, this, retryLater, size);
+        List<byte[]> idBytesList = RedisZSetScriptHelper.poll(connectionFactory, keysBuilder, this, retryLater, size);
         return loadMessages(idBytesList);
     }
 
@@ -70,7 +71,7 @@ public class RedisListQueueConsumer implements Consumer {
         boolean isDeleted = getGroup().getSetting().getDeleteAfterAck();
         boolean isArchive = getGroup().getSetting().getIsArchive();
         for (Long id : ids) {
-            long ack = RedisListScriptHelper.ack(connectionFactory, keysBuilder, this, isDeleted, isArchive, id);
+            long ack = RedisZSetScriptHelper.ack(connectionFactory, keysBuilder, this, isDeleted, isArchive, id);
             logger.debug("ack success, index：{}", ack);
         }
     }

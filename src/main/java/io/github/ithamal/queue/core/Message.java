@@ -9,11 +9,9 @@ public interface Message<T> {
 
     Long getId();
 
+    void setId(Long id);
+
     Long getTime();
 
     T getPayload();
-
-    Integer getRetries();
-
-    void setRetries(Integer retries);
 }

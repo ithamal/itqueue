@@ -1,4 +1,4 @@
-package io.github.ithamal.queue.support.redis.list;
+package io.github.ithamal.queue.support.redis.zset;
 
 import io.github.ithamal.queue.config.ProducerSetting;
 import io.github.ithamal.queue.core.Message;
@@ -16,7 +16,7 @@ import java.util.Collection;
  * @since: 2023-09-28 17:52
  */
 @SuppressWarnings("unchecked")
-public class RedisListQueueProducer implements Producer {
+public class RedisZSetQueueProducer implements Producer {
 
     private final RedisConnectionFactory connectionFactory;
 
@@ -28,7 +28,7 @@ public class RedisListQueueProducer implements Producer {
 
     private final MsgIdGenerator msgIdGenerator;
 
-    public RedisListQueueProducer(ProducerSetting setting, RedisConnectionFactory connectionFactory) {
+    public RedisZSetQueueProducer(ProducerSetting setting, RedisConnectionFactory connectionFactory) {
         this.setting = setting;
         this.msgIdGenerator = new MsgIdGenerator(setting.getNodeId());
         this.connectionFactory = connectionFactory;
@@ -44,7 +44,7 @@ public class RedisListQueueProducer implements Producer {
         byte[] valueBytes = serializer.serialize(message);
         assert valueBytes != null;
         byte[] msgIdBytes = String.valueOf(message.getId()).getBytes();
-        RedisListScriptHelper.put(connectionFactory, keysBuilder, msgIdBytes, valueBytes);
+        RedisZSetScriptHelper.put(connectionFactory, keysBuilder, msgIdBytes, valueBytes);
     }
 
     @Override

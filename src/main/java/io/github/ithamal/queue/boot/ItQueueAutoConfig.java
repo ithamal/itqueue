@@ -12,7 +12,9 @@ import io.github.ithamal.queue.service.ConsumerManager;
 import io.github.ithamal.queue.service.ConsumersContainer;
 import io.github.ithamal.queue.service.ProducerManager;
 import io.github.ithamal.queue.support.jdk.JdkQueueFactory;
+import io.github.ithamal.queue.support.redis.RedisComposeQueueFactory;
 import io.github.ithamal.queue.support.redis.list.RedisListQueueFactory;
+import io.github.ithamal.queue.support.redis.zset.RedisZSetQueueFactory;
 import io.github.ithamal.queue.support.spring.ConsumersContainerLifecycle;
 import io.github.ithamal.queue.support.spring.SpringMessageHandlerProvider;
 import org.springframework.beans.factory.support.BeanDefinitionValidationException;
@@ -53,12 +55,12 @@ public class ItQueueAutoConfig {
 
     /**
      * @param connectionFactory redis连接工厂
-     * @return Redis队列工厂
+     * @return list结构队列工厂
      */
     @Bean
     @ConditionalOnBean(RedisConnectionFactory.class)
-    public RedisListQueueFactory redisListQueueFactory(RedisConnectionFactory connectionFactory) {
-        return new RedisListQueueFactory(connectionFactory);
+    public RedisComposeQueueFactory redisQueueFactory(RedisConnectionFactory connectionFactory) {
+        return new RedisComposeQueueFactory(connectionFactory);
     }
 
     /**
@@ -104,7 +106,9 @@ public class ItQueueAutoConfig {
             for (String pattern : annotation.value()) {
                 List<ConsumerGroup> consumerGroups = consumerManager.findConsumers(pattern);
                 for (ConsumerGroup consumerGroup : consumerGroups) {
-                    consumersContainer.binding(consumerGroup, handler);
+                    if (annotation.consumerGroup().isEmpty() || annotation.consumerGroup().equals(consumerGroup.getName())) {
+                        consumersContainer.binding(consumerGroup, handler);
+                    }
                 }
             }
         }
