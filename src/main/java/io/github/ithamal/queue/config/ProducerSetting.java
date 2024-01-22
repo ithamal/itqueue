@@ -31,9 +31,9 @@ public class ProducerSetting {
     private Integer nodeId;
 
     public void afterProperties() {
-        Assert.notNull(queue, "Producer setting [queue] isn't specified");
-        Assert.notNull(implClass, "Producer setting [implClass] isn't specified");
-        Assert.isTrue(nodeId == null || nodeId < 16383, "Producer setting [nodeId] must less then 16383");
+        Assert.notNull(queue, "A property 'queue' of  producer setting isn't specified.");
+        Assert.notNull(implClass, "A property 'implClass' of  producer setting isn't specified.");
+        Assert.isTrue(nodeId == null || nodeId < 16383, "A property 'nodeId' of  producer setting must less than 16383.");
         name = name != null ? name : queue;
         prefix = prefix != null ? prefix : "queue:";
         serializer = serializer != null ? serializer : "json";

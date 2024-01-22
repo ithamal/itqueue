@@ -25,7 +25,7 @@ public class DefaultConsumersContainer implements ConsumersContainer {
         ConsumerGroupContainer container = containerMap.computeIfAbsent(consumerGroup,
                 it -> new DefaultConsumerGroupContainer(consumerGroup));
         container.registerHandler(handler);
-        logger.info("Message handler [{}] has been registered", handler);
+        logger.info("The message handler '{}' has been registered", handler);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DefaultConsumersContainer implements ConsumersContainer {
                 container.start();
             } catch (Exception e) {
                 String groupName = container.getConsumerGroup().getName();
-                logger.error("Occur exception when consumers container to start:" + groupName, e);
+                logger.error("An exception occurred during the startup of consumer container '"+ groupName +"'", e);
             }
         }
     }
@@ -54,7 +54,7 @@ public class DefaultConsumersContainer implements ConsumersContainer {
                 container.shutdown();
             } catch (Exception e) {
                 String groupName = container.getConsumerGroup().getName();
-                logger.error("Occur exception when consumers container to start:" + groupName, e);
+                logger.error("An exception occurred during the shutdown of consumer container '"+ groupName +"'", e);
             }
         }
     }
@@ -66,7 +66,8 @@ public class DefaultConsumersContainer implements ConsumersContainer {
             try {
                 result = result || container.awaitTermination(timeout, unit);
             } catch (Exception e) {
-                logger.error("Occur exception when consumers container await terminating:" + container.getConsumerGroup(), e);
+                String groupName = container.getConsumerGroup().getName();
+                logger.error("An exception occurred during the termination of consumer container '"+ groupName +"'", e);
             }
         }
         return result;

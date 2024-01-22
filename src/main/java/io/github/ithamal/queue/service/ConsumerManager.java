@@ -31,10 +31,10 @@ public class ConsumerManager {
         QueueFactory queueFactory = selectQueueFactory(consumerSetting.getImplClass());
         ConsumerGroup consumerGroup = queueFactory.createConsumerGroup(consumerSetting);
         if (consumerMap.containsKey(name)) {
-            throw new IllegalArgumentException("duplication of consumer group:" + name);
+            logger.info("The consumer group '{}' is repeated", name);
         }
         consumerMap.put(name, consumerGroup);
-        logger.info("Consumer group [{}] has been registered", name);
+            logger.info("The consumer group '{}' has been registered", name);
 
     }
 
@@ -58,6 +58,6 @@ public class ConsumerManager {
                 return queueFactory;
             }
         }
-        throw new RuntimeException("没有找到队列工厂:" + implClass);
+        throw new RuntimeException("Can't find a queue factory named " + implClass);
     }
 }

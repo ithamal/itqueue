@@ -37,8 +37,8 @@ public class ConsumerSetting {
     private String implClass;
 
     public void afterProperties() {
-        Assert.notNull(queue, "Consumer setting [queue] isn't specified");
-        Assert.notNull(implClass, "Consumer setting [implClass] isn't specified");
+        Assert.notNull(queue, "A property 'queue' of  consumer setting isn't specified");
+        Assert.notNull(implClass, "A property 'implClass' of  consumer setting isn't specified");
         name = name != null ? name : queue;
         groupName = groupName != null ? groupName : "default";
         prefix = prefix != null ? prefix : "queue:";

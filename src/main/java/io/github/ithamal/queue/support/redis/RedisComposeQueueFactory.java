@@ -39,7 +39,7 @@ public class RedisComposeQueueFactory implements QueueFactory {
                 return queueFactory.createProducer(setting);
             }
         }
-        throw new IllegalArgumentException("not support impClass [" + setting.getImplClass() + "] for redis queue factory");
+        throw new IllegalArgumentException("The implement class '" + setting.getImplClass() + "' of redis queue factory isn't supported");
     }
 
     @Override
@@ -49,6 +49,6 @@ public class RedisComposeQueueFactory implements QueueFactory {
                 return queueFactory.createConsumerGroup(setting);
             }
         }
-        throw new IllegalArgumentException("not support impClass [" + setting.getImplClass() + "] for redis queue factory");
+        throw new IllegalArgumentException("The implement class '" + setting.getImplClass() + "' of redis queue factory isn't supported");
     }
 }

@@ -29,7 +29,8 @@ public class RedisSerializerFactory {
             try {
                 return (RedisSerializer<?>) Class.forName(name).newInstance();
             } catch (Throwable e) {
-                throw new RuntimeException("序列化类加载失败：" + name);
+                // serialize class "x" load failed, didn't supported
+                throw new RuntimeException("The serialize class '"+ name +"' failed to load as it's not supported");
             }
         });
     }

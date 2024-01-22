@@ -21,7 +21,7 @@ public class RedisZSetLuaScriptManager {
         return scriptMap.computeIfAbsent(name, k -> {
             InputStream inputStream = RedisZSetQueueConsumer.class.getResourceAsStream("lua/" + name);
             if (inputStream == null) {
-                throw new RuntimeException("脚本文件[" + name + "]不存在");
+                throw new RuntimeException("The script '" + name + "' doest not exist");
             }
             try {
                 return StreamUtils.copyToByteArray(inputStream);

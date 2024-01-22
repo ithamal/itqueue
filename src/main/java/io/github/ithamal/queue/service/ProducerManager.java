@@ -29,7 +29,7 @@ public class ProducerManager {
         QueueFactory queueFactory = selectQueueFactory(producerSetting.getImplClass());
         Producer producer = queueFactory.createProducer(producerSetting);
         producerMap.put(producerSetting.getName(), producer);
-        logger.info("Producer [{}] has been registered", producerSetting.getName());
+        logger.info("Producer '{}' has been registered", producerSetting.getName());
     }
 
     public Producer getProducer(String name) {

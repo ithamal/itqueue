@@ -110,7 +110,7 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
                     loop(true);
                 }
             } catch (Exception e) {
-                logger.error("Occur exception during handle messages from consumer [" + consumer.getName() + "]", e);
+                logger.error("An exception occurred during the handing of consumer group consumer'" + consumer.getName() + "'", e);
                 loop(false);
             }
         }
