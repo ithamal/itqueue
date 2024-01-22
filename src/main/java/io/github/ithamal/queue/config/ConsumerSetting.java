@@ -20,6 +20,8 @@ public class ConsumerSetting {
 
     private Integer pollSize;
 
+    private Integer pollInterval;
+
     private String groupName;
 
     private Integer consumerNum;
@@ -40,7 +42,8 @@ public class ConsumerSetting {
         name = name != null ? name : queue;
         groupName = groupName != null ? groupName : "default";
         prefix = prefix != null ? prefix : "queue:";
-        pollSize = pollSize != null ? pollSize : 10;
+        pollSize = pollSize != null ? pollSize : 1;
+        pollInterval = pollInterval != null ? pollInterval : 0;
         consumerNum = consumerNum != null ? consumerNum : 1;
         deleteAfterAck = deleteAfterAck != null ? deleteAfterAck : false;
         isArchive = isArchive != null ? isArchive : true;

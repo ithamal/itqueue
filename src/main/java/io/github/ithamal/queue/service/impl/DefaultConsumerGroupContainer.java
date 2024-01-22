@@ -103,18 +103,29 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
                 ConsumerSetting setting = consumerGroup.getSetting();
                 Collection<Message<?>> messages = consumer.poll(setting.getPollSize());
                 if (messages.isEmpty()) {
-                    consumeTaskPoolExecutor.schedule(this, 1, TimeUnit.SECONDS);
+                    loop(false);
                 } else {
                     CompletableFuture<Void> future = messageHandlerExecutor.handle(messages, consumer);
                     future.get();
-                    consumeTaskPoolExecutor.execute(this);
+                    loop(true);
                 }
             } catch (Exception e) {
-                consumeTaskPoolExecutor.schedule(this, 1, TimeUnit.SECONDS);
                 logger.error("Occur exception during handle messages from consumer [" + consumer.getName() + "]", e);
+                loop(false);
             }
         }
 
-
+        private void loop(boolean immediate) {
+            ConsumerSetting setting = consumerGroup.getSetting();
+            if (setting.getPollInterval() > 0) {
+                consumeTaskPoolExecutor.schedule(this, setting.getPollInterval(), TimeUnit.SECONDS);
+            } else {
+                if (immediate) {
+                    consumeTaskPoolExecutor.execute(this);
+                } else {
+                    consumeTaskPoolExecutor.schedule(this, 1, TimeUnit.SECONDS);
+                }
+            }
+        }
     }
 }
