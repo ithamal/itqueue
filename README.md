@@ -2,7 +2,7 @@
 ```xml
 <groupId>io.github.ithamal</groupId>
 <artifactId>itqueue</artifactId>
-<version>1.0.3</version>
+<version>1.0.4</version>
 ```
 
 ### 特性

@@ -62,8 +62,6 @@ public class JdkQueueTests {
         consumerSetting.setQueue("test");
         consumerSetting.setGroupName("group1");
         consumerSetting.setConsumerNum(5);
-        consumerSetting.setMinThreads(1);
-        consumerSetting.setMaxThreads(2);
         consumerSetting.afterProperties();
         // 测试
         JdkQueueFactory jdkQueueFactory = new JdkQueueFactory();

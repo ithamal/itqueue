@@ -1,12 +1,10 @@
 package io.github.ithamal.queue.service.impl;
 
 import io.github.ithamal.queue.config.ConsumerSetting;
-import io.github.ithamal.queue.config.MessageHandlerSetting;
 import io.github.ithamal.queue.core.Consumer;
 import io.github.ithamal.queue.core.ConsumerGroup;
 import io.github.ithamal.queue.core.Message;
 import io.github.ithamal.queue.handler.MessageHandler;
-import io.github.ithamal.queue.handler.executor.MessageHandlerConcurrentExecutor;
 import io.github.ithamal.queue.handler.executor.MessageHandlerExecutor;
 import io.github.ithamal.queue.handler.executor.MessageHandlerSyncExecutor;
 import io.github.ithamal.queue.service.ConsumerGroupContainer;
@@ -27,7 +25,7 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
 
     private final static Logger logger = LoggerFactory.getLogger(DefaultConsumerGroupContainer.class);
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ScheduledThreadPoolExecutor consumeTaskPoolExecutor;
 
     private final ConsumerGroup consumerGroup;
 
@@ -35,8 +33,6 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
 
 
     private final Object lock = new Object();
-
-    private MessageHandlerExecutor handlerExecutor;
 
     public DefaultConsumerGroupContainer(ConsumerGroup consumerGroup) {
         this.consumerGroup = consumerGroup;
@@ -65,35 +61,25 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
     @Override
     public void start() {
         String groupName = consumerGroup.getSetting().getGroupName();
-        MessageHandlerSetting handlerSetting = consumerGroup.getSetting().getHandler();
-        if (handlerSetting == null || handlerSetting.getThreads() <= 0) {
-            this.handlerExecutor = new MessageHandlerSyncExecutor(handlerList);
-        } else {
-            int threads = handlerSetting.getThreads();
-            String threadPrefix = "message-handler-" + groupName;
-            this.handlerExecutor = new MessageHandlerConcurrentExecutor(threadPrefix, handlerList, threads);
-        }
-        int minThreads = consumerGroup.getSetting().getMinThreads();
-        int maxThreads = consumerGroup.getSetting().getMaxThreads();
+        int threads = consumerGroup.getSetting().getConsumerNum();
         ThreadFactory threadFactory = new CustomizableThreadFactory("consumer-group-" + groupName);
-        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-        threadPoolExecutor = new ThreadPoolExecutor(minThreads, maxThreads, 10, TimeUnit.SECONDS, queue, threadFactory);
+        consumeTaskPoolExecutor = new ScheduledThreadPoolExecutor(threads, threadFactory);
         for (Consumer consumer : consumerGroup.getConsumers()) {
-            threadPoolExecutor.execute(new ConsumeTask(consumer));
+            consumeTaskPoolExecutor.execute(new ConsumeTask(consumer));
         }
     }
 
     @Override
     public void shutdown() {
         synchronized (lock) {
-            threadPoolExecutor.shutdownNow();
+            consumeTaskPoolExecutor.shutdownNow();
         }
     }
 
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        return threadPoolExecutor.awaitTermination(timeout, unit);
+        return consumeTaskPoolExecutor.awaitTermination(timeout, unit);
     }
 
 
@@ -101,38 +87,34 @@ public class DefaultConsumerGroupContainer implements ConsumerGroupContainer {
 
         private final Consumer consumer;
 
+        private final MessageHandlerExecutor messageHandlerExecutor;
+
         public ConsumeTask(Consumer consumer) {
             this.consumer = consumer;
+            this.messageHandlerExecutor = new MessageHandlerSyncExecutor(handlerList);
         }
 
+        /**
+         * 拉取并消费消息
+         */
         @Override
         public void run() {
-            ConsumerSetting setting = consumerGroup.getSetting();
-            Collection<Message<?>> messages = consumer.poll(setting.getPollSize());
-            CompletableFuture<Void> future = handlerExecutor.handle(messages, consumer);
-            future.thenApply(r -> {
-                rePushTask();
-                return null;
-            }).exceptionally(e -> {
-                logger.error("Occur exception when consumer [" + consumer.getName() + "] handling", e);
-                rePushTask();
-                return null;
-            });
             try {
-                if (!setting.getHandleAsync()) {
+                ConsumerSetting setting = consumerGroup.getSetting();
+                Collection<Message<?>> messages = consumer.poll(setting.getPollSize());
+                if (messages.isEmpty()) {
+                    consumeTaskPoolExecutor.schedule(this, 1, TimeUnit.SECONDS);
+                } else {
+                    CompletableFuture<Void> future = messageHandlerExecutor.handle(messages, consumer);
                     future.get();
+                    consumeTaskPoolExecutor.execute(this);
                 }
             } catch (Exception e) {
-                logger.error("Occur exception when consumer [" + consumer.getName() + "] handling", e);
+                consumeTaskPoolExecutor.schedule(this, 1, TimeUnit.SECONDS);
+                logger.error("Occur exception during handle messages from consumer [" + consumer.getName() + "]", e);
             }
         }
 
-        private void rePushTask() {
-            synchronized (lock) {
-                if (!threadPoolExecutor.isShutdown() && !threadPoolExecutor.isTerminating()) {
-                    threadPoolExecutor.execute(this);
-                }
-            }
-        }
+
     }
 }
